@@ -1,0 +1,115 @@
+### Visão ###
+>	Geral
+	Jogo sobre um lobo que tem que matar porquinhos em um jogo top-down
+	Ao derrotar porcos o bastante, surge uma casa de palha, madeira ou tijolos como minichefes
+	Quantos mais porcos derrotar, mais fortes eles ficam
+	O último chefe é a Chapeuzinho Vermelho, matar ela completa o jogo
+
+>	Objetivo
+	O objetivo é matar os quatro chefes: as Casas de Palha, Madeira e Tijolo e a Chapeuzinho Vermelho, enquanto evita morrer para os porcos inimigos que vêm.
+
+>	Mecanismos de jogo: Lobo
+	O Lobo possui duas barras: Vida e Energia.
+	A Energia é gasta para o Lobo poder realizar a maioria das mecânicas. Ela regenera ao longo do tempo, e ficar sem deixa ele vulnerável.
+
+	O primeiro ataque é um combo normal que o Lobo executa com as garras.
+	O segundo ataque é Devorar, para finalizações devastadoras. Gasta energia.
+	O terceiro ataque é Soprar, para controle de área e danificar casas. Gasta energia.
+
+	A primeira abilidade é Desviar, para evitar ataques completamente. Gasta energia.
+	O segunda abilidade é Bloquear, para reduzir o dano causado de qualquer direção. Gasta energia proporcional ao dano causado.
+
+>	Mecanismos de jogo: Porcos
+	Os porcos se aproximam do jogador com cuidado, com geralmente seis fases de operação.
+		Perseguição: O porco corre até o raio de alcance do Lobo, e troca para Ataque.
+		Ataque: O porco se move cuidadosamente dentro do raio do Lobo, podendo trocar para Golpe.
+		Golpe: O porco prepara e solta um golpe.
+		Defesa: O porco fica na periferia do Lobo com a defesa preparada, podendo trocar para Ataque ou Cura.
+		Cura: O porco fica parado para recuperar vida.
+		Fuga: O porco foge para a borda do mapa e desaparece.
+	Os porcos sempre realizam uma animação de preparo antes de concluir um Golpe.
+		Porcos fracos podem ser interrompidos por um ataque enquanto se preparam.
+		Porcos fortes não são interrompidos em seu preparo, exceto se mortos.
+	Porcos com escudos levantam o escudo em Defesa e Ataque, absorvendo o dano causado.
+		O escudo pode ser destruído com golpes.
+		O escudo pode ser soprado para longe com Soprar.
+		Devorar nunca funcionará contra um escudo, e será defletido.
+	Porcos com lanças levantam a lança em Defesa.
+		Devorar causa dano crítico ao Lobo contra uma lança levantada.
+
+>	Mecanismos de jogo: Casas TODO
+
+>	Mecanismos de jogo: Chapeuzinho Vermelho TODO
+
+>	Risco e recompensa
+	O lobo possui dois ataques especiais: devorar e soprar
+	Devorar é um ataque lento, mas que recupera a vida do lobo. Ao errar, o lobo fica vulnerável à ataques inimigos por alguns instantes.
+	Soprar é um ataque que usa a energia do lobo para desarmar os porquinhos, tornando-os vulneráveis. Ficar sem energia torna o Lobo vulnerável.
+
+### Requisitos (*==opcional, quanto mais asteriscos, mais opcional.) ###
+	Ter interface de jogo que represente a vida e a energia disponíveis.
+		*Ter efeitos bônus ao regenerar/perder vida/energia.
+		*Ter o perfil do Lobo com reações a dano e etc. estilo Pizza Tower
+
+	Ter botão de pausa que leva ao menu.
+		Botão de sair.
+		**Botão de opções.
+
+	Parede invisível como parte do mundo: uma cerca, com árvores do outro lado, para onde os porcos fogem.
+
+	Implementar três vidas.
+	Implementar minimapa que mostre os inimigos e o Lobo.
+		*Mostrar porcos que estão se curando.
+	Implementar módulo de animação para uso geral.
+	Implementar entidades (representa Lobo, Porco, Casa, Chefe, ou qualquer coisa outra coisa 'ativa').
+	Implementar OOP com cada inimigo diferente.
+	Implementar árvore de comportamentos para todas as entidades.
+
+	Combo de três ataques.
+		Rasga <, rasga >, rasgão ><.
+		Poder parar o combo no meio e reiniciar, estilo Fatal Fury.
+
+	Desviar.
+
+	Bloquear.
+		Dano divertido à energia, enquanto houver energia.
+		Punir com knockback e bloqueio desligado temporariamente.
+
+	**Parriar.
+
+	Soprar porcos.
+		Desarmar porcos peça a peça enquanto os sopra.
+		Porcos pelados fogem.
+		Punir ao ficar sem energia com velocidade reduzida e abilidades desligadas até recuperar energia o bastante.
+
+	Devorar porcos.
+		Regenerar vida ao devorar porcos.
+		Impedir devorar porcos em posição defensiva.
+		Punir ao errar com punish time.
+		Punir ao ser defletido com dano à vida (lança) ou energia (escudo).
+
+	Regenerar energia passivamente.
+		Regenerar mais enquanto parado.
+
+	Ter os seguintes inimigos:
+		Porco
+			com (arma)
+				espada
+				lança
+			com (escudo)
+				*pequeno
+				grande
+			**com (armadura)
+				**chapéu de palha
+				**capacete
+		Casa de Palha
+		Casa de Madeira
+		Casa de Tijolos
+		Chapeuzinho Vermelho
+		**Ovelhas
+		*O Caçador
+		*A Vovózinha
+		*Porcos com armadura
+
+	Finalizar as casas com Soprar.
+	Finalizar os chefes com Devorar.
