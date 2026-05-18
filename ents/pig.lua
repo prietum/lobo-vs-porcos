@@ -15,7 +15,7 @@ function _pig.new()
 	return setmetatable(new_pig, _pig)
 end
 
-function _pig:updateBehavior(dt)
+function _pig:updateBehavior(dt, world)
 	self.dx = self.dx + math.random(-50,50) * dt
 	self.dy = self.dy + math.random(-50,50) * dt
 end

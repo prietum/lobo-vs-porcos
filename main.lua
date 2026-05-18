@@ -3,13 +3,13 @@ local _wolf = require("ents.wolf")
 local _pig = require("ents.pig")
 local _wall = require("ents.wall")
 local _camera = require("ents.camera")
+local _world = require("ents.world")
 
 function newPlayer()
 	local plr = _wolf.new()
 	plr.x = 0
 	plr.y = 0
-	plr:setWorld(entities)
-	entities[#entities+1] = plr
+	world:setPlayer(plr)
 	return plr
 end
 
@@ -18,13 +18,12 @@ function newEnemy()
 	local spwang = math.random(0,628)/100 --todo
 	pig.x=-100
 	pig.y= 100
-	pig:setWorld(entities)
-	entities[#entities+1] = pig
+	world:addEntity(pig)
 end
 
 function newCamera()
 	local cam = _camera.new()
-	entities[#entities+1] = cam
+	world:setCamera(cam)
 	return cam
 end
 
@@ -37,22 +36,22 @@ function newWalls()
 	wall_right.name = "Right wall"
 	wall_top.name = "Top wall"
 	wall_bottom.name = "Bottom wall"
-	wall_left:setWorld(entities)
-	wall_right:setWorld(entities)
-	wall_top:setWorld(entities)
-	wall_bottom:setWorld(entities)
-	wall_left:setNonCollide({wall_top, wall_right, wall_bottom})
-	wall_right:setNonCollide({wall_top, wall_left, wall_bottom})
-	wall_top:setNonCollide({wall_left, wall_right, wall_bottom})
-	wall_bottom:setNonCollide({wall_top, wall_right, wall_left})
-	entities[#entities+1] = wall_left
-	entities[#entities+1] = wall_right
-	entities[#entities+1] = wall_top 
-	entities[#entities+1] = wall_bottom
+
+	world:addEntity(wall_left)
+	world:addEntity(wall_right)
+	world:addEntity(wall_top)
+	world:addEntity(wall_bottom)
+
+	world:setNoCollide(wall_left, wall_right)
+	world:setNoCollide(wall_left, wall_top)
+	world:setNoCollide(wall_left, wall_bottom)
+	world:setNoCollide(wall_right, wall_top)
+	world:setNoCollide(wall_right, wall_bottom)
+	world:setNoCollide(wall_top, wall_bottom)
 end
 
 function love.load()
-	entities = {}
+	world = _world.new()
 
 	newWalls()
 	cam = newCamera()
@@ -92,22 +91,12 @@ function love.update(dt)
 		love.event.push("spawnEnemy")
 	end
 
-	--Update entity behavior.
-	for k,ent in pairs(entities) do
-		ent:updateBehavior(dt)
-	end
-
-	--Update entity physics.
-	for k,ent in pairs(entities) do
-		ent:updatePhysics(dt)
-	end
-
-	cam:updatePhysics(dt) --Atualiza de novo para que não fique travando
+	world:updateAll(dt)
 end
 
 function love.draw()
 	love.graphics.clear(0,0,0,0)
-	for k,ent in pairs(entities) do
+	for k,ent in pairs(world:getEntities()) do
 		ent:draw(cam)
 	end
 end

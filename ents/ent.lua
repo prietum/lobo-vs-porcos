@@ -16,40 +16,25 @@ function _ent.new()
 	new_ent.mx=0
 	new_ent.my=0
 
-	new_ent.world = {}
-	new_ent.noncollide = {}
-
 	setmetatable(new_ent, _ent)
 	return new_ent
 end
 
-function _ent:setWorld(world)
-	self.world = world
-end
+function _ent:updateBehavior(dt, world) end
 
-function _ent:setNonCollide(noncollide)
-	self.noncollide = noncollide
-end
-
-function _ent:updateBehavior(dt) end
-
-function _ent:updatePhysics(dt)
+function _ent:updatePhysics(dt, world)
 	--anti noclip: checks only when i'm in movement!
 	if self.dx ~= 0 or self.dy ~= 0 then
 		local collx = false
 		local colly = false
-		for k, ent in ipairs(self.world) do
+		for k, ent in ipairs(world:getEntities()) do
 			local ego = false
 			local nc = false
 			local atom = false
 
 			ego = self==ent
 			atom = ent.width==0 and ent.height==0
-			if not ego and not atom then
-				for k2, nc_ent in ipairs(self.noncollide) do
-					if nc_ent==ent then nc = true break end
-				end
-			end
+			nc = world:isNoCollide(self, ent)
 
 			if not ego and not atom and not nc then
 				local AA = self.x+self.width+self.dx*dt>ent.x and self.x+self.dx*dt<ent.x+ent.width
