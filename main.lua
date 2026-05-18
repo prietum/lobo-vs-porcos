@@ -5,6 +5,11 @@ local _wall = require("ents.wall")
 local _camera = require("ents.camera")
 local _world = require("ents.world")
 
+local healthbar = require("ui.healthbar")
+local menu = require("ui.menu")
+local minimap = require("ui.minimap")
+local enemy_healthbars = require("ui.enm_healthbars")
+
 function newPlayer()
 	local plr = _wolf.new()
 	plr.x = 0
