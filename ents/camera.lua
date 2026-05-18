@@ -14,7 +14,7 @@ function _camera:setFocus(ent)
 	self.focus = ent
 end
 
-function _camera:update()
+function _camera:updatePhysics()
 	if self.focus then
 		self.x = self.focus.x
 		self.y = self.focus.y

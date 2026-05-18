@@ -31,7 +31,9 @@ function _ent:setNonCollide(noncollide)
 	self.noncollide = noncollide
 end
 
-function _ent:update(dt)
+function _ent:updateBehavior(dt) end
+
+function _ent:updatePhysics(dt)
 	--anti noclip: checks only when i'm in movement!
 	if self.dx ~= 0 or self.dy ~= 0 then
 		local collx = false
@@ -54,7 +56,7 @@ function _ent:update(dt)
 				local BB = self.y+self.height+self.dy*dt>ent.y and self.y+self.dy*dt<ent.y+ent.height
 				
 				if AA and BB then
-					print(self.name, "collided with", ent.name)
+					--print(self.name, "collided with", ent.name)
 
 					local dffx = math.min(math.abs((self.x+self.width)-(ent.x)),math.abs((self.x)-(ent.x+ent.width)))
 					local dffy = math.min(math.abs((self.y+self.height)-(ent.y)),math.abs((self.y)-(ent.y+ent.height)))

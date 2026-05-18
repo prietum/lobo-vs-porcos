@@ -16,6 +16,7 @@ function _wall.new(x,y,width,height)
 end
 
 function _wall:draw(camera)
+	if not camera then return end
 	local offx, offy = camera:getDrawOffset()
 	love.graphics.rectangle("fill", 
 		self.x+offx, 

@@ -4,34 +4,35 @@ local _pig = require("ents.pig")
 local _wall = require("ents.wall")
 local _camera = require("ents.camera")
 
-function love.load()
-	entities = {}
-
-	plr = _wolf.new()
-	plr.x = 100
-	plr.y = 100
+function newPlayer()
+	local plr = _wolf.new()
+	plr.x = 0
+	plr.y = 0
 	plr:setWorld(entities)
-	entities[1] = plr
+	entities[#entities+1] = plr
+	return plr
+end
 
-	camera = _camera.new()
-	camera:setFocus(plr)
-	entities[8] = camera
+function newEnemy()
+	local pig = _pig.new()
+	local spwang = math.random(0,628)/100 --todo
+	pig.x=-100
+	pig.y= 100
+	pig:setWorld(entities)
+	entities[#entities+1] = pig
+end
 
-	pig1 = _pig.new()
-	pig1.x=200
-	pig1.y=200
-	pig1:setWorld(entities)
-	entities[2] = pig1
-	pig2 = _pig.new()
-	pig2.x=-200
-	pig2.y=-100
-	pig2:setWorld(entities)
-	entities[3] = pig2
+function newCamera()
+	local cam = _camera.new()
+	entities[#entities+1] = cam
+	return cam
+end
 
-	wall_left=_wall.new(-500,-500,30,1000)
-	wall_right=_wall.new(500,-500,30,1030)
-	wall_top=_wall.new(-500, -500, 1000, 30)
-	wall_bottom=_wall.new(-500, 500, 1030, 30)
+function newWalls()
+	local wall_left=_wall.new(-500,-500,30,1000)
+	local wall_right=_wall.new(500,-500,30,1030)
+	local wall_top=_wall.new(-500, -500, 1000, 30)
+	local wall_bottom=_wall.new(-500, 500, 1030, 30)
 	wall_left.name = "Left wall"
 	wall_right.name = "Right wall"
 	wall_top.name = "Top wall"
@@ -44,10 +45,23 @@ function love.load()
 	wall_right:setNonCollide({wall_top, wall_left, wall_bottom})
 	wall_top:setNonCollide({wall_left, wall_right, wall_bottom})
 	wall_bottom:setNonCollide({wall_top, wall_right, wall_left})
-	entities[4] = wall_left
-	entities[5] = wall_right
-	entities[6] = wall_top 
-	entities[7] = wall_bottom
+	entities[#entities+1] = wall_left
+	entities[#entities+1] = wall_right
+	entities[#entities+1] = wall_top 
+	entities[#entities+1] = wall_bottom
+end
+
+function love.load()
+	entities = {}
+
+	newWalls()
+	cam = newCamera()
+	plr = newPlayer()
+	cam:setFocus(plr)
+end
+
+function love.handlers.spawnEnemy()
+	newEnemy()
 end
 
 function love.keyreleased(key)
@@ -62,6 +76,7 @@ function love.keypressed(key)
 	end
 end
 
+local b = 1
 function love.update(dt)
 	--movement
 	plr.mx = ((ipt["left"] and -1) or 0) + ((ipt["right"] and 1) or 0)
@@ -71,14 +86,28 @@ function love.update(dt)
 	plr.dx = plr.mx*500
 	plr.dy = plr.my*500
 
-	for k,ent in ipairs(entities) do
-		ent:update(dt)
+	b = b - dt
+	if b<=0 then
+		b = b + 1
+		love.event.push("spawnEnemy")
 	end
+
+	--Update entity behavior.
+	for k,ent in pairs(entities) do
+		ent:updateBehavior(dt)
+	end
+
+	--Update entity physics.
+	for k,ent in pairs(entities) do
+		ent:updatePhysics(dt)
+	end
+
+	cam:updatePhysics(dt) --Atualiza de novo para que não fique travando
 end
 
 function love.draw()
 	love.graphics.clear(0,0,0,0)
-	for k,ent in ipairs(entities) do
-		ent:draw(camera)
+	for k,ent in pairs(entities) do
+		ent:draw(cam)
 	end
 end
