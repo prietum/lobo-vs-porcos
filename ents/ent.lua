@@ -4,6 +4,7 @@ _ent.__index = _ent
 function _ent.new()
 	local new_ent = {}
 	new_ent.name = "Unnamed Entity"
+	new_ent.class = "Entity"
 
 	new_ent.x=0
 	new_ent.y=0
@@ -16,14 +17,19 @@ function _ent.new()
 	new_ent.mx=0
 	new_ent.my=0
 
+	new_ent.destroyed = false
+
 	setmetatable(new_ent, _ent)
 	return new_ent
 end
 
-function _ent:updateBehavior(dt, world) end
+function _ent:updateBehavior(dt, world) assert(dt, world) end
 
 function _ent:updatePhysics(dt, world)
+	assert(dt, world)
+	--print("updatePhysics")
 	--anti noclip: checks only when i'm in movement!
+
 	if self.dx ~= 0 or self.dy ~= 0 then
 		local collx = false
 		local colly = false
@@ -34,7 +40,7 @@ function _ent:updatePhysics(dt, world)
 
 			ego = self==ent
 			atom = ent.width==0 and ent.height==0
-			nc = world:isNoCollide(self, ent)
+			nc = world:isNoCollide(self, ent) or ent.class == "hitbox"
 
 			if not ego and not atom and not nc then
 				local AA = self.x+self.width+self.dx*dt>ent.x and self.x+self.dx*dt<ent.x+ent.width
@@ -75,5 +81,9 @@ function _ent:updatePhysics(dt, world)
 end
 
 function _ent:draw(camera) end
+
+function _ent:destroy()
+	self.destroyed = true
+end
 
 return _ent

@@ -3,6 +3,7 @@ local _wolf = require("ents.wolf")
 local _pig = require("ents.pig")
 local _wall = require("ents.wall")
 local _camera = require("ents.camera")
+local _hitbox = require("ents.hitbox")
 local _world = require("ents.world")
 
 local healthbar = require("ui.healthbar")
@@ -24,6 +25,11 @@ function newEnemy()
 	pig.x=-100
 	pig.y= 100
 	world:addEntity(pig)
+	for _, other_pig in pairs(world:getEntities()) do
+		if other_pig.class == "pig" and other_pig ~= pig then
+			world:setNoCollide(pig, other_pig)
+		end
+	end
 end
 
 function newCamera()
@@ -64,6 +70,22 @@ function love.load()
 	cam:setFocus(plr)
 end
 
+function love.handlers.entHit(hitted, hitbox)
+	print("YEAOUCH!!!", hitted.name, hitbox.caster.name)
+end
+
+function love.handlers.plrAttack()
+	hitbox = _hitbox.new()
+	u = (plr.omx^2+plr.omy^2)^(1/2)
+	hitbox.x = plr.x + (plr.omx/u)*30
+	hitbox.y = plr.y + (plr.omy/u)*30
+	hitbox.width = 30
+	hitbox.height = 30
+	hitbox.caster = plr
+	world:addEntity(hitbox)
+	hitbox:queryOnce()
+end
+
 function love.handlers.spawnEnemy()
 	newEnemy()
 end
@@ -83,17 +105,18 @@ end
 local b = 1
 function love.update(dt)
 	--movement
-	plr.mx = ((ipt["left"] and -1) or 0) + ((ipt["right"] and 1) or 0)
-	plr.my = ((ipt["up"] and -1) or 0) + ((ipt["down"] and 1) or 0)
-
-	--velocity
-	plr.dx = plr.mx*500
-	plr.dy = plr.my*500
+	nmx = ((ipt["left"] and -1) or 0) + ((ipt["right"] and 1) or 0)
+	nmy = ((ipt["up"] and -1) or 0) + ((ipt["down"] and 1) or 0)
+	plr:setMove(nmx, nmy)
 
 	b = b - dt
 	if b<=0 then
 		b = b + 1
 		love.event.push("spawnEnemy")
+	end
+
+	if ipt["atk1"] then
+		plr:attack()
 	end
 
 	world:updateAll(dt)
@@ -102,6 +125,7 @@ end
 function love.draw()
 	love.graphics.clear(0,0,0,0)
 	for k,ent in pairs(world:getEntities()) do
+		--print("drawing ent ",k, ent)
 		ent:draw(cam)
 	end
 end

@@ -7,6 +7,9 @@ setmetatable(_pig, _ent)
 function _pig.new()
 	local new_pig = _ent.new()
 
+	new_pig.name = "pig"
+	new_pig.class = "pig"
+
 	new_pig.maxhp=100
 	new_pig.hp=new_pig.maxhp
 	new_pig.width = 30
@@ -23,6 +26,7 @@ end
 function _pig:draw(camera)
 	if not camera then return end
 	local offx, offy = camera:getDrawOffset()
+	love.graphics.setColor(1,1,0)
 	love.graphics.rectangle("line",
 		self.x + offx, 
 		self.y + offy, 

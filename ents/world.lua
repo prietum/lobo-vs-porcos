@@ -46,7 +46,7 @@ function _world:isNoCollide(ent1, ent2)
 	if ent1==ent2 then return false end
 	local r = false
 	for _, nc in pairs(self.ncs) do
-		if nc[1]==ent1 and nc[2]==ent2 then
+		if (nc[1]==ent1 and nc[2]==ent2) or (nc[2]==ent1 and nc[1]==ent2) then
 			r = true
 			break
 		end
@@ -55,6 +55,9 @@ function _world:isNoCollide(ent1, ent2)
 end
 
 function _world:updateAll(dt)
+	--Garbage-collect entities.
+	--TODO, make unique E-ID system
+
 	--Update entity behavior.
 	for k,ent in pairs(self:getEntities()) do
 		ent:updateBehavior(dt, self)
@@ -62,7 +65,9 @@ function _world:updateAll(dt)
 
 	--Update entity physics.
 	for k,ent in pairs(self:getEntities()) do
-		ent:updatePhysics(dt, self)
+		--print("updating entity ",k)
+		--print(ent.updatePhysics)
+		ent:updatePhysics(dt, world)
 	end
 
 	cam:updatePhysics(dt, self) --Atualiza de novo para que não fique travando

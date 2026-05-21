@@ -7,6 +7,9 @@ setmetatable(_camera, _ent)
 function _camera.new()
 	local new_camera = _ent.new()
 
+	new_camera.name = "camera"
+	new_camera.class = "camera"
+
 	return setmetatable(new_camera, _camera)
 end
 

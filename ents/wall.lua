@@ -7,6 +7,9 @@ setmetatable(_wall, _ent)
 function _wall.new(x,y,width,height)
 	local new_wall = _ent.new()
 
+	new_wall.name = "wall"
+	new_wall.class = "wall"
+
 	new_wall.x = x
 	new_wall.y = y
 	new_wall.width = width
@@ -18,6 +21,7 @@ end
 function _wall:draw(camera)
 	if not camera then return end
 	local offx, offy = camera:getDrawOffset()
+	love.graphics.setColor(1,1,1)
 	love.graphics.rectangle("fill", 
 		self.x+offx, 
 		self.y+offy, 
