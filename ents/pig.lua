@@ -19,6 +19,11 @@ function _pig.new()
 end
 
 function _pig:updateBehavior(dt, world)
+	if self.hp <= 0 then
+		self:destroy()
+		return
+	end
+
 	self.dx = self.dx + math.random(-50,50) * dt
 	self.dy = self.dy + math.random(-50,50) * dt
 end

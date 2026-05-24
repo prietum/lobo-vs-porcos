@@ -70,8 +70,13 @@ function love.load()
 	cam:setFocus(plr)
 end
 
-function love.handlers.entHit(hitted, hitbox)
-	print("YEAOUCH!!!", hitted.name, hitbox.caster.name)
+function love.handlers.entHit(hitted_id, hitbox_id)
+	hitted = world:getEntity(hitted_id)
+	hitbox = world:getEntity(hitbox_id)
+	--print("YEAOUCH!!!", hitted.name, hitbox.caster.name)
+	hitted.hp = math.max(hitted.hp - 100, 0)
+	print("handler pig addr",hitted,hitted.class)
+	print(hitted.name,"hp is",hitted.hp)
 end
 
 function love.handlers.plrAttack()
@@ -102,6 +107,10 @@ function love.keypressed(key)
 	end
 end
 
+--lembrete
+--		>	passe entidades pelos eventos como ID. elas não são passadas por referência, aparentemente.
+--			ent.id ao invés de ent
+
 local b = 1
 function love.update(dt)
 	--movement
@@ -111,12 +120,17 @@ function love.update(dt)
 
 	b = b - dt
 	if b<=0 then
-		b = b + 1
+		b = b + 10
+		local tab = {math.random(1,100)}
 		love.event.push("spawnEnemy")
 	end
 
 	if ipt["atk1"] then
 		plr:attack()
+	end
+
+	if ipt["atk2"] then
+		world:printAllEntities()
 	end
 
 	world:updateAll(dt)

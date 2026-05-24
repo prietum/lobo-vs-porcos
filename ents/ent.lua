@@ -4,7 +4,8 @@ _ent.__index = _ent
 function _ent.new()
 	local new_ent = {}
 	new_ent.name = "Unnamed Entity"
-	new_ent.class = "Entity"
+	new_ent.class = "entity"
+	new_ent.id = -1
 
 	new_ent.x=0
 	new_ent.y=0
@@ -81,6 +82,8 @@ function _ent:updatePhysics(dt, world)
 end
 
 function _ent:draw(camera) end
+
+function _ent:setid(id) self.id = id end
 
 function _ent:destroy()
 	self.destroyed = true

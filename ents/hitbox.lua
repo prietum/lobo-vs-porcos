@@ -18,6 +18,10 @@ function _hitbox.new()
 	return setmetatable(new_hitbox, _hitbox)
 end
 
+function _hitbox:updateBehavior()
+	self:destroy()
+end
+
 function _hitbox:updatePhysics(dt, world) --TODO switch for radial check
 	if not self.querying then return end
 	for k, ent in pairs(world:getEntities()) do
@@ -28,14 +32,16 @@ function _hitbox:updatePhysics(dt, world) --TODO switch for radial check
 		ego = self==ent
 		dad = self.caster and self.caster==ent
 		atom = ent.width==0 and ent.height==0
+		hbx = ent.class == "hitbox" or ent.class == "wall"
 
-		if not ego and not atom and not dad then
+		if not ego and not atom and not dad and not hbx then
 			local AA = self.x+self.width>ent.x and self.x<ent.x+ent.width
 			local BB = self.y+self.height>ent.y and self.y<ent.y+ent.height
 			
 			if AA and BB then
 				--Collided
-				love.event.push("entHit", ent, self) --TODO ver pq q ta printando wolf
+				--print("entHit:", self.name, "->", ent.name)
+				love.event.push("entHit", ent.id, self.id) --TODO ver pq q ta printando wolf
 			end
 		end
 	end
