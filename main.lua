@@ -6,10 +6,10 @@ local _camera = require("ents.camera")
 local _hitbox = require("ents.hitbox")
 local _world = require("ents.world")
 
-local healthbar = require("ui.healthbar")
-local menu = require("ui.menu")
-local minimap = require("ui.minimap")
-local enemy_healthbars = require("ui.enm_healthbars")
+--local healthbar = require("ui.healthbar")
+--local menu = require("ui.menu")
+--local minimap = require("ui.minimap")
+--local enemy_healthbars = require("ui.enm_healthbars")
 
 function newPlayer()
 	local plr = _wolf.new()
@@ -73,20 +73,25 @@ end
 function love.handlers.entHit(hitted_id, hitbox_id)
 	hitted = world:getEntity(hitted_id)
 	hitbox = world:getEntity(hitbox_id)
-	--print("YEAOUCH!!!", hitted.name, hitbox.caster.name)
-	hitted.hp = math.max(hitted.hp - 100, 0)
-	print("handler pig addr",hitted,hitted.class)
-	print(hitted.name,"hp is",hitted.hp)
+
+	if hitted.class == "pig" and hitted.state ~= "stun" then
+		hitted.state = "stun"
+		hitted.stun_t = 0.2
+		hitted.dx = hitbox.usr_data[1]*900
+		hitted.dy = hitbox.usr_data[2]*900
+		hitted.hp = math.max(hitted.hp - 34, 0)
+	end
 end
 
-function love.handlers.plrAttack()
+function love.handlers.queryHitbox(x,y,w,h,caster,usr_data)
 	hitbox = _hitbox.new()
-	u = (plr.omx^2+plr.omy^2)^(1/2)
-	hitbox.x = plr.x + (plr.omx/u)*30
-	hitbox.y = plr.y + (plr.omy/u)*30
-	hitbox.width = 30
-	hitbox.height = 30
-	hitbox.caster = plr
+	hitbox.x = x
+	hitbox.y = y
+	hitbox.width = w
+	hitbox.height = h
+	hitbox.caster = caster
+	hitbox.usr_data = usr_data
+
 	world:addEntity(hitbox)
 	hitbox:queryOnce()
 end

@@ -15,6 +15,9 @@ function _pig.new()
 	new_pig.width = 30
 	new_pig.height = 30
 
+	new_pig.state = "idle"
+	new_pig.stun_t = 0
+
 	return setmetatable(new_pig, _pig)
 end
 
@@ -24,13 +27,25 @@ function _pig:updateBehavior(dt, world)
 		return
 	end
 
-	self.dx = self.dx + math.random(-50,50) * dt
-	self.dy = self.dy + math.random(-50,50) * dt
+	self.stun_t = math.max(self.stun_t-dt,0)
+
+	if self.state == "idle" then
+		self.dx = self.dx + math.random(-50,50) * dt
+		self.dy = self.dy + math.random(-50,50) * dt
+	elseif self.state == "stun" then
+		if self.stun_t <= 0 then
+			self.state = "idle"
+			self.dx = 0
+			self.dy = 0
+		end
+	end
 end
 
 function _pig:draw(camera)
 	if not camera then return end
 	local offx, offy = camera:getDrawOffset()
+
+	--Hitbox
 	love.graphics.setColor(1,1,0)
 	love.graphics.rectangle("line",
 		self.x + offx, 
@@ -38,6 +53,15 @@ function _pig:draw(camera)
 		self.width,
 		self.height
 	)
+
+	--Healthbar.
+	love.graphics.setColor(1,1,1)
+	love.graphics.rectangle("fill",
+		self.x + offx,
+		self.y + self.height + 5 + offy,
+		self.width * self.hp/self.maxhp,
+		5
+		)
 end
 
 return _pig

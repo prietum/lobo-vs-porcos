@@ -25,10 +25,20 @@ function _wolf.new()
 	new_wolf.width = 30
 	new_wolf.height = 30
 
+	--idle, atk1, atk2, atk3, stun
+	new_wolf.state = "idle"
+	new_wolf.atk1_t = 0
+	new_wolf.atk1_tt = 0.1
+	new_wolf.atk1_c = 0
+	new_wolf.atk1_cc = 0.4
+	new_wolf.stun_t = 0
+
 	return setmetatable(new_wolf, _wolf)
 end
 
 function _wolf:setMove(mx, my)
+	if self.state == "stun" then return end
+
 	if mx ~= 0 or my ~= 0 then
 		self.omx = mx
 		self.omy = my
@@ -38,15 +48,52 @@ function _wolf:setMove(mx, my)
 end
 
 function _wolf:attack()
-	love.event.push("plrAttack")
+	--love.event.push("plrAttacked", self)
+	if self.state == "idle" and self.atk1_c <= 0 then
+		self.state = "atk1"
+		self.atk1_t = self.atk1_tt
+		self.atk1_c = self.atk1_cc
+	end
 end
 
 function _wolf:updateBehavior(dt, world)
-	--print("wolf behavior")
-	--print(self.mx, self.my)
-	self.dx = self.mx*500
-	self.dy = self.my*500
-	--print(self.dx, self.dy)
+	--if self.hp <= 0 then
+	--	self:destroy()
+	--	return
+	--end
+
+	self.atk1_c = math.max(self.atk1_c-dt,0)
+	self.atk1_t = math.max(self.atk1_t-dt,0)
+	self.stun_t = math.max(self.stun_t-dt,0)
+
+	if self.state == "idle" then
+		self.dx = self.mx*250
+		self.dy = self.my*250
+	elseif self.state == "atk1" then
+		if self.atk1_t <= 0 then
+			self.state = "idle"
+		end
+
+		do
+			u = (self.omx^2+self.omy^2)^(1/2)
+			ox = (self.omx/u)
+			oy = (self.omy/u)
+			x = self.x + ox*60
+			y = self.y + oy*60
+			w = 45
+			h = 45
+			caster = self
+			usr_data = {ox,oy}
+			love.event.push("queryHitbox",x,y,w,h,caster,usr_data)
+		end
+
+		self.dx = self.mx*500
+		self.dy = self.my*500
+	elseif self.state == "stun" then
+		if self.stun_t <= 0 then
+			self.state = "idle"
+		end
+	end
 end
 
 function _wolf:draw(camera)

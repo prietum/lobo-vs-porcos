@@ -20,7 +20,7 @@ end
 
 function _world:getEntity(id)
 	ent = self._ents[id]
-	assert(ent)
+	if not ent then error() end
 	return ent
 end
 
