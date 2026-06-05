@@ -30,8 +30,21 @@ function _pig:updateBehavior(dt, world)
 	self.stun_t = math.max(self.stun_t-dt,0)
 
 	if self.state == "idle" then
-		self.dx = self.dx + math.random(-50,50) * dt
-		self.dy = self.dy + math.random(-50,50) * dt
+		plr = world:getPlayer()
+		if plr then
+			diffx = plr.x - self.x
+			diffy = plr.y - self.y
+			diffm = (diffx^2+diffy^2)^0.5
+
+			dirx = diffx/diffm
+			diry = diffy/diffm
+
+			self.dx = dirx * 100
+			self.dy = diry * 100
+		else
+			self.dx = 0
+			self.dy = 0
+		end
 	elseif self.state == "stun" then
 		if self.stun_t <= 0 then
 			self.state = "idle"

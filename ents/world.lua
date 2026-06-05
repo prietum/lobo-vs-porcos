@@ -5,8 +5,8 @@ function _world.new()
 	new_world = {}
 	new_world._ents = {}
 	new_world._ncs = {}
-	plrid = nil
-	camid = nil
+	new_world.plrid = nil
+	new_world.camid = nil
 
 	return setmetatable(new_world, _world)
 end
@@ -29,21 +29,21 @@ function _world:getEntities()
 end
 
 function _world:setPlayer(plr)
-	--TODO give it a special spot
-	return self:addEntity(plr)
+	self.plrid = self:addEntity(plr)
+	return self.plrid
 end
 
 function _world:getPlayer()
-	return plrid and self._ents[plrid]
+	return self._ents[self.plrid]
 end
 
 function _world:setCamera(cam)
-	--TODO give it a special spot
-	return self:addEntity(cam)
+	self.camid = self:addEntity(cam)
+	return self.camid
 end
 
 function _world:getCamera()
-	return camid and self._ents[camid]
+	return self._ents[self.camid]
 end
 
 function _world:setNoCollide(ent1,ent2)

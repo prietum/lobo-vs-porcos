@@ -83,6 +83,8 @@ function love.handlers.entHit(hitted_id, hitbox_id)
 	end
 end
 
+--TODO implemente porcos te perseguirem!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 function love.handlers.queryHitbox(x,y,w,h,caster,usr_data)
 	hitbox = _hitbox.new()
 	hitbox.x = x
@@ -118,6 +120,7 @@ end
 
 local b = 1
 function love.update(dt)
+	plr = world:getPlayer()
 	--movement
 	nmx = ((ipt["left"] and -1) or 0) + ((ipt["right"] and 1) or 0)
 	nmy = ((ipt["up"] and -1) or 0) + ((ipt["down"] and 1) or 0)
