@@ -67,7 +67,7 @@ function _pig:draw(camera)
 		self.height
 	)
 
-	--Healthbar.
+	--Healthbar
 	love.graphics.setColor(1,1,1)
 	love.graphics.rectangle("fill",
 		self.x + offx,

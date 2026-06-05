@@ -98,6 +98,8 @@ end
 
 function _wolf:draw(camera)
 	if not camera then return end
+
+	--Hitbox
 	local offx, offy = camera:getDrawOffset()
 	love.graphics.setColor(1,0,1)
 	love.graphics.rectangle("fill", 
@@ -105,6 +107,15 @@ function _wolf:draw(camera)
 		self.y + offy, 
 		self.width,
 		self.height
+		)
+
+	--Healthbar TODO replace with UI element
+	love.graphics.setColor(1,1,1)
+	love.graphics.rectangle("fill",
+		self.x + offx,
+		self.y + self.height + 5 + offy,
+		self.width * self.hp/self.maxhp,
+		5
 		)
 end
 
