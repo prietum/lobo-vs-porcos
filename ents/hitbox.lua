@@ -35,10 +35,12 @@ function _hitbox:updatePhysics(dt, world) --TODO switch for radial check
 		local dead = false
 
 		dead = ent.destroyed
-		ego = self==ent
-		dad = self.caster and self.caster==ent
+		ego = self.id==ent.id
+		dad = self.casterid==ent.id
 		atom = ent.width==0 and ent.height==0
 		hbx = ent.class == "hitbox" or ent.class == "wall"
+
+		--print(self.caster, ent)
 
 		if not dead and not ego and not atom and not dad and not hbx then
 			local AA = self.x+self.width>ent.x and self.x<ent.x+ent.width
@@ -46,7 +48,7 @@ function _hitbox:updatePhysics(dt, world) --TODO switch for radial check
 			
 			if AA and BB then
 				--Collided
-				--print("entHit:", self.name, "->", ent.name)
+				print("entHit:", self.name, "->", ent.name)
 				love.event.push("entHit", ent.id, self.id)
 			end
 		end

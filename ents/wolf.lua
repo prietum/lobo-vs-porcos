@@ -74,6 +74,7 @@ function _wolf:updateBehavior(dt, world)
 			self.state = "idle"
 		end
 
+		--Cast hitbox
 		do
 			u = (self.omx^2+self.omy^2)^(1/2)
 			ox = (self.omx/u)
@@ -82,9 +83,9 @@ function _wolf:updateBehavior(dt, world)
 			y = self.y + oy*60
 			w = 45
 			h = 45
-			caster = self
+			casterid = self.id
 			usr_data = {ox,oy}
-			love.event.push("queryHitbox",x,y,w,h,caster,usr_data)
+			love.event.push("queryHitbox",x,y,w,h,casterid,usr_data)
 		end
 
 		self.dx = self.mx*500

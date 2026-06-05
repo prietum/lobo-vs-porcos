@@ -19,8 +19,10 @@ function _world:addEntity(ent)
 end
 
 function _world:getEntity(id)
+	assert(type(id)=="number", "_world:getEntity(id): id passed is not a number.")
 	ent = self._ents[id]
-	if not ent then error() end
+	assert(ent, string.format("Entity id:%d not found.", id))
+	if not ent then error(string.format("Entity %d not found!", id)) end
 	return ent
 end
 

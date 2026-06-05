@@ -73,25 +73,40 @@ end
 function love.handlers.entHit(hitted_id, hitbox_id)
 	hitted = world:getEntity(hitted_id)
 	hitbox = world:getEntity(hitbox_id)
+	caster = world:getEntity(hitbox.casterid)
+
+	if not hitted then print("entHit cancelled: no 'hitted'.") return end
+	if not hitbox then print("entHit cancelled: no 'hitbox'.") return end
+	if not caster then print("entHit cancelled: no 'caster'.") return end
+
+	--print(caster.class, "hitted", hitted.class, "with", hitbox.class)
 
 	if hitted.class == "pig" and hitted.state ~= "stun" then
+		print("wolf hitted pig.")
+
 		hitted.state = "stun"
 		hitted.stun_t = 0.2
 		hitted.dx = hitbox.usr_data[1]*900
 		hitted.dy = hitbox.usr_data[2]*900
 		hitted.hp = math.max(hitted.hp - 34, 0)
+	elseif hitted.class == "wolf" and hitted.state ~= "stun" then
+		print("pig hitted wolf.")
+
+		hitted.state = "stun"
+		hitted.stun_t = 0.2
+		hitted.dx = hitbox.usr_data[1]*900
+		hitted.dy = hitbox.usr_data[2]*900
+		hitted.hp = math.max(hitted.hp - 10, 0)
 	end
 end
 
---TODO implemente porcos te perseguirem!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-function love.handlers.queryHitbox(x,y,w,h,caster,usr_data)
+function love.handlers.queryHitbox(x,y,w,h,casterid,usr_data)
 	hitbox = _hitbox.new()
 	hitbox.x = x
 	hitbox.y = y
 	hitbox.width = w
 	hitbox.height = h
-	hitbox.caster = caster
+	hitbox.casterid = casterid
 	hitbox.usr_data = usr_data
 
 	world:addEntity(hitbox)

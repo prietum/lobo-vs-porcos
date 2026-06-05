@@ -16,9 +16,21 @@ function _pig.new()
 	new_pig.height = 30
 
 	new_pig.state = "idle"
+	new_pig.atk_t = 0
+	new_pig.atk_tt = 0.1
+	new_pig.atk_c = 0
+	new_pig.atk_cc = 0.4
 	new_pig.stun_t = 0
 
 	return setmetatable(new_pig, _pig)
+end
+
+function _pig:attack()
+	if self.state == "idle" and self.atk_c <= 0 then
+		self.state = "atk"
+		self.atk_t = self.atk_tt
+		self.atk_c = self.atk_cc
+	end
 end
 
 function _pig:updateBehavior(dt, world)
@@ -27,24 +39,49 @@ function _pig:updateBehavior(dt, world)
 		return
 	end
 
+	plr = world:getPlayer()
+	if plr then
+		diffx = plr.x - self.x
+		diffy = plr.y - self.y
+		diffm = (diffx^2+diffy^2)^0.5
+
+		dirx = diffx/diffm
+		diry = diffy/diffm
+	end
+
+	self.atk_c = math.max(self.atk_c-dt,0)
+	self.atk_t = math.max(self.atk_t-dt,0)
 	self.stun_t = math.max(self.stun_t-dt,0)
 
 	if self.state == "idle" then
-		plr = world:getPlayer()
 		if plr then
-			diffx = plr.x - self.x
-			diffy = plr.y - self.y
-			diffm = (diffx^2+diffy^2)^0.5
-
-			dirx = diffx/diffm
-			diry = diffy/diffm
-
 			self.dx = dirx * 100
 			self.dy = diry * 100
 		else
 			self.dx = 0
 			self.dy = 0
 		end
+
+		if diffm < 100 then
+			self:attack()
+		end
+	elseif self.state == "atk" then
+		if self.atk_t <= 0 then
+			self.state = "idle"
+		end
+		--Cast hitbox
+		do
+			x = self.x + dirx*25
+			y = self.y + diry*25
+			w = 30
+			h = 30
+			casterid = self.id
+			usr_data = {dirx, diry}
+			love.event.push("queryHitbox",x,y,w,h,casterid,usr_data)
+		end
+
+		self.dx = self.mx*500
+		self.dy = self.my*500
 	elseif self.state == "stun" then
 		if self.stun_t <= 0 then
 			self.state = "idle"
