@@ -34,7 +34,11 @@ function _ent:updatePhysics(dt, world)
 	if self.dx ~= 0 or self.dy ~= 0 then
 		local collx = false
 		local colly = false
-		for k, ent in ipairs(world:getEntities()) do
+		for k, ent in pairs(world:getEntities()) do
+			if self.class == "pig" then
+				print(string.format("checking against ent id:%d, class:%s", k, ent.class))
+			end
+
 			local ego = false
 			local nc = false
 			local atom = false

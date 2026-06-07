@@ -12,8 +12,8 @@ function _world.new()
 end
 
 function _world:addEntity(ent)
-	self._ents[#self._ents+1] = ent
-	entid = #self._ents
+	entid = #self._ents+1
+	self._ents[entid] = ent
 	ent:setid(entid)
 	return entid
 end
@@ -21,6 +21,7 @@ end
 function _world:getEntity(id)
 	assert(type(id)=="number", "_world:getEntity(id): id passed is not a number.")
 	ent = self._ents[id]
+	if ent.destroyed then print(string.format("Entity id:%d class:%s is destroyed.", id, ent.class)) end
 	assert(ent, string.format("Entity id:%d not found.", id))
 	if not ent then error(string.format("Entity %d not found!", id)) end
 	return ent
@@ -32,10 +33,18 @@ end
 
 function _world:setPlayer(plr)
 	self.plrid = self:addEntity(plr)
+	--print("setPlayer:",self.plrid,plr,plr.class)
+	--print("setPlayer result:",self.plrid, self._ents[self.plrid], self._ents[self.plrid].class)
 	return self.plrid
 end
 
 function _world:getPlayer()
+	--if self.plrid then
+		--print("getPlayer",self.plrid, self._ents[self.plrid], self._ents[self.plrid].class)
+	--else
+		--print("getPlayer",self.plrid, self._ents[self.plrid])
+	--end
+	
 	return self._ents[self.plrid]
 end
 
@@ -90,6 +99,11 @@ function _world:updateAll(dt)
 		if ent.destroyed then
 			self:destroyNoCollidesWith(ent)
 			self._ents[k] = nil
+
+			-- clear up special id vars
+			if self.plrid == k then print("Player destroyed.") self.plrid = nil
+			elseif self.camid == k then print("Camera destroyed.") self.camid = nil
+			end
 		else
 			ent:updateBehavior(dt, self)
 			ent:updatePhysics(dt, world)

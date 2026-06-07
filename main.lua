@@ -16,6 +16,10 @@ function newPlayer()
 	plr.x = 0
 	plr.y = 0
 	world:setPlayer(plr)
+
+	local cam = world:getCamera()
+	cam:setFocus(plr)
+
 	return plr
 end
 
@@ -66,8 +70,6 @@ function love.load()
 
 	newWalls()
 	cam = newCamera()
-	plr = newPlayer()
-	cam:setFocus(plr)
 end
 
 function love.handlers.entHit(hitted_id, hitbox_id)
@@ -96,7 +98,7 @@ function love.handlers.entHit(hitted_id, hitbox_id)
 		hitted.stun_t = 0.2
 		hitted.dx = hitbox.usr_data[1]*900
 		hitted.dy = hitbox.usr_data[2]*900
-		hitted.hp = math.max(hitted.hp - 10, 0)
+		hitted.hp = math.max(hitted.hp - 34, 0)
 	end
 end
 
@@ -117,6 +119,10 @@ function love.handlers.spawnEnemy()
 	newEnemy()
 end
 
+function love.handlers.respawnPlayer()
+	newPlayer()
+end
+
 function love.keyreleased(key)
 	ipt.update(key,false)
 end
@@ -135,25 +141,32 @@ end
 
 local b = 1
 function love.update(dt)
-	plr = world:getPlayer()
-	--movement
-	nmx = ((ipt["left"] and -1) or 0) + ((ipt["right"] and 1) or 0)
-	nmy = ((ipt["up"] and -1) or 0) + ((ipt["down"] and 1) or 0)
-	plr:setMove(nmx, nmy)
+	--world:printAllEntities()
+	local plr = world:getPlayer()
+
+	if plr then
+		--print(plr, plr.class)
+		--movement
+		nmx = ((ipt["left"] and -1) or 0) + ((ipt["right"] and 1) or 0)
+		nmy = ((ipt["up"] and -1) or 0) + ((ipt["down"] and 1) or 0)
+		plr:setMove(nmx, nmy)
+
+		if ipt["atk1"] then
+			plr:attack()
+		end
+
+		if ipt["atk2"] then
+			world:printAllEntities()
+		end
+	else
+		love.event.push("respawnPlayer")
+	end
 
 	b = b - dt
 	if b<=0 then
 		b = b + 10
 		local tab = {math.random(1,100)}
 		love.event.push("spawnEnemy")
-	end
-
-	if ipt["atk1"] then
-		plr:attack()
-	end
-
-	if ipt["atk2"] then
-		world:printAllEntities()
 	end
 
 	world:updateAll(dt)

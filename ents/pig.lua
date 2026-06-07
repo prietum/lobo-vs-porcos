@@ -57,13 +57,13 @@ function _pig:updateBehavior(dt, world)
 		if plr then
 			self.dx = dirx * 100
 			self.dy = diry * 100
+
+			if diffm < 100 then
+				self:attack()
+			end
 		else
 			self.dx = 0
 			self.dy = 0
-		end
-
-		if diffm < 100 then
-			self:attack()
 		end
 	elseif self.state == "atk" then
 		if self.atk_t <= 0 then

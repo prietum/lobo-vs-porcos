@@ -57,10 +57,10 @@ function _wolf:attack()
 end
 
 function _wolf:updateBehavior(dt, world)
-	--if self.hp <= 0 then
-	--	self:destroy()
-	--	return
-	--end
+	if self.hp <= 0 then
+		self:destroy()
+		return
+	end
 
 	self.atk1_c = math.max(self.atk1_c-dt,0)
 	self.atk1_t = math.max(self.atk1_t-dt,0)
@@ -79,8 +79,8 @@ function _wolf:updateBehavior(dt, world)
 			u = (self.omx^2+self.omy^2)^(1/2)
 			ox = (self.omx/u)
 			oy = (self.omy/u)
-			x = self.x + ox*60
-			y = self.y + oy*60
+			x = self.x + ox*75
+			y = self.y + oy*75
 			w = 45
 			h = 45
 			casterid = self.id
