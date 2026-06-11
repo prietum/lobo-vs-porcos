@@ -5,15 +5,11 @@ local _wolf = {}
 _wolf.__index = _wolf
 setmetatable(_wolf, _ent)
 
-local imgs = {
-	idle=love.graphics.newImage("assets/sprites/lobo_idle.png")
-}
+local img = love.graphics.newImage("assets/sprites/spriteshit.png")
 
-imgs.idle:setFilter("nearest", "nearest")
+img:setFilter("nearest", "nearest")
 
-local imggrids = {
-	idle=anim8.newGrid(64,64,512,64,0,0,0)
-}
+local grid = anim8.newGrid(64,64,512,192,0,0,0)
 
 function _wolf.new()
 	local new_wolf = _ent.new()
@@ -40,13 +36,15 @@ function _wolf.new()
 	--idle, atk1, atk2, atk3, stun
 	new_wolf.state = "idle"
 	new_wolf.atk1_t = 0
-	new_wolf.atk1_tt = 0.1
+	new_wolf.atk1_tt = 0.6
 	new_wolf.atk1_c = 0
 	new_wolf.atk1_cc = 0.4
 	new_wolf.stun_t = 0
 
 	new_wolf.anim = {
-		idle=anim8.newAnimation(imggrids.idle("1-8",1),0.1)
+		idle=anim8.newAnimation(grid("1-8",1),0.1),
+		walk=anim8.newAnimation(grid("1-8",2),0.1),
+		atk1=anim8.newAnimation(grid("1-6",3),0.1),
 	}
 
 	return setmetatable(new_wolf, _wolf)
@@ -72,6 +70,8 @@ function _wolf:attack()
 	--love.event.push("plrAttacked", self)
 	if self.state == "idle" and self.atk1_c <= 0 then
 		self.state = "atk1"
+		self.anim.atk1:gotoFrame(1)
+		self.anim.atk1:resume()
 		self.atk1_t = self.atk1_tt
 		self.atk1_c = self.atk1_cc
 	end
@@ -84,6 +84,8 @@ function _wolf:updateBehavior(dt, world)
 	end
 
 	self.anim.idle:update(dt)
+	self.anim.walk:update(dt)
+	self.anim.atk1:update(dt)
 
 	self.atk1_c = math.max(self.atk1_c-dt,0)
 	self.atk1_t = math.max(self.atk1_t-dt,0)
@@ -135,14 +137,35 @@ function _wolf:draw(camera)
 
 	--Sprite
 	love.graphics.setColor(1,1,1)
-	self.anim.idle:draw(
-		imgs.idle, 
-		self.x + offx - 48 + math.abs(math.min(self.oomx, 0)) * 128, 
-		self.y + offy - 48,
-		0,
-		2 * self.oomx,
-		2
+	if self.state == "atk1" then
+		self.anim.atk1:draw(
+			img, 
+			self.x + offx - 64/4 + math.abs(math.min(self.oomx, 0)) * 64*1, 
+			self.y + offy - 64/4,
+			0,
+			1 * self.oomx,
+			1
 		)
+	--elseif self.state == "stun" then
+	elseif self.mx ~= 0 or self.my ~= 0 then
+		self.anim.walk:draw(
+			img, 
+			self.x + offx - 64/4 + math.abs(math.min(self.oomx, 0)) * 64*1, 
+			self.y + offy - 64/4,
+			0,
+			1 * self.oomx,
+			1
+		)
+	else
+		self.anim.idle:draw(
+			img, 
+			self.x + offx - 64/4 + math.abs(math.min(self.oomx, 0)) * 64*1, 
+			self.y + offy - 64/4,
+			0,
+			1 * self.oomx,
+			1
+		)
+	end
 
 	--Healthbar TODO replace with UI element
 	love.graphics.setColor(1,1,1)
