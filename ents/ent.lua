@@ -36,7 +36,7 @@ function _ent:updatePhysics(dt, world)
 		local colly = false
 		for k, ent in pairs(world:getEntities()) do
 			if self.class == "pig" then
-				print(string.format("checking against ent id:%d, class:%s", k, ent.class))
+				--print(string.format("checking against ent id:%d, class:%s", k, ent.class))
 			end
 
 			local ego = false

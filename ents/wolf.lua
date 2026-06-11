@@ -1,8 +1,19 @@
 local _ent = require("ents.ent")
+local anim8 = require("anim8")
 
 local _wolf = {}
 _wolf.__index = _wolf
 setmetatable(_wolf, _ent)
+
+local imgs = {
+	idle=love.graphics.newImage("assets/sprites/lobo_idle.png")
+}
+
+imgs.idle:setFilter("nearest", "nearest")
+
+local imggrids = {
+	idle=anim8.newGrid(64,64,512,64,0,0,0)
+}
 
 function _wolf.new()
 	local new_wolf = _ent.new()
@@ -21,6 +32,7 @@ function _wolf.new()
 
 	new_wolf.omx = 1
 	new_wolf.omy = 0
+	new_wolf.oomx =1
 
 	new_wolf.width = 30
 	new_wolf.height = 30
@@ -33,6 +45,10 @@ function _wolf.new()
 	new_wolf.atk1_cc = 0.4
 	new_wolf.stun_t = 0
 
+	new_wolf.anim = {
+		idle=anim8.newAnimation(imggrids.idle("1-8",1),0.1)
+	}
+
 	return setmetatable(new_wolf, _wolf)
 end
 
@@ -43,6 +59,11 @@ function _wolf:setMove(mx, my)
 		self.omx = mx
 		self.omy = my
 	end
+
+	if mx ~= 0 then
+		self.oomx = mx
+	end
+
 	self.mx = mx
 	self.my = my
 end
@@ -61,6 +82,8 @@ function _wolf:updateBehavior(dt, world)
 		self:destroy()
 		return
 	end
+
+	self.anim.idle:update(dt)
 
 	self.atk1_c = math.max(self.atk1_c-dt,0)
 	self.atk1_t = math.max(self.atk1_t-dt,0)
@@ -103,11 +126,22 @@ function _wolf:draw(camera)
 	--Hitbox
 	local offx, offy = camera:getDrawOffset()
 	love.graphics.setColor(1,0,1)
-	love.graphics.rectangle("fill", 
+	love.graphics.rectangle("line", 
 		self.x + offx, 
 		self.y + offy, 
 		self.width,
 		self.height
+		)
+
+	--Sprite
+	love.graphics.setColor(1,1,1)
+	self.anim.idle:draw(
+		imgs.idle, 
+		self.x + offx - 48 + math.abs(math.min(self.oomx, 0)) * 128, 
+		self.y + offy - 48,
+		0,
+		2 * self.oomx,
+		2
 		)
 
 	--Healthbar TODO replace with UI element
