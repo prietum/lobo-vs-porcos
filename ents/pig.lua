@@ -25,6 +25,22 @@ function _pig.new()
 	return setmetatable(new_pig, _pig)
 end
 
+function _pig:damage(v)
+	self.hp = math.max(self.hp - v, 0)
+end
+
+function _pig:stun(t, dir, spd)
+	self.state = "stun"
+
+	--local anim = self.anim["stun"..tostring(self.stun_p)]
+	--anim:gotoFrame(1)
+	--anim:resume()
+
+	self.stun_t = t
+	self.dx = dir[1]*spd
+	self.dy = dir[2]*spd
+end
+
 function _pig:attack()
 	if self.state == "idle" and self.atk_c <= 0 then
 		self.state = "atk"

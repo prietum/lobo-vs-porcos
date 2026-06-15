@@ -86,19 +86,13 @@ function love.handlers.entHit(hitted_id, hitbox_id)
 	if hitted.class == "pig" and hitted.state ~= "stun" then
 		print("wolf hitted pig.")
 
-		hitted.state = "stun"
-		hitted.stun_t = 0.2
-		hitted.dx = hitbox.usr_data[1]*900
-		hitted.dy = hitbox.usr_data[2]*900
-		hitted.hp = math.max(hitted.hp - 34, 0)
+		hitted:damage(10)
+		hitted:stun(0.2, {hitbox.usr_data[1], hitbox.usr_data[2]}, 500)
 	elseif hitted.class == "wolf" and hitted.state ~= "stun" then
 		print("pig hitted wolf.")
 
-		hitted.state = "stun"
-		hitted.stun_t = 0.2
-		hitted.dx = hitbox.usr_data[1]*900
-		hitted.dy = hitbox.usr_data[2]*900
-		hitted.hp = math.max(hitted.hp - 34, 0)
+		hitted:damage(10)
+		hitted:stun(0.3, {hitbox.usr_data[1], hitbox.usr_data[2]}, 300)
 	end
 end
 
