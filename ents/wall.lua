@@ -18,10 +18,12 @@ function _wall.new(x,y,width,height)
 	return setmetatable(new_wall, _wall)
 end
 
+local test = false
 function _wall:draw(camera)
+	if not test then return end
 	if not camera then return end
 	local offx, offy = camera:getDrawOffset()
-	love.graphics.setColor(1,1,1)
+	love.graphics.setColor(1,0,1)
 	love.graphics.rectangle("fill", 
 		self.x+offx, 
 		self.y+offy, 

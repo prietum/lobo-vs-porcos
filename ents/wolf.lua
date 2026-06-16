@@ -5,10 +5,8 @@ local _wolf = {}
 _wolf.__index = _wolf
 setmetatable(_wolf, _ent)
 
-local img = love.graphics.newImage("assets/sprites/spriteshit.png")
-
+local img = love.graphics.newImage("assets/sprites/lobo.png")
 img:setFilter("nearest", "nearest")
-
 local grid = anim8.newGrid(64,64,512,512,0,0,0)
 
 function _wolf.new()

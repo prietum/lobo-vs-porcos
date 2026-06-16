@@ -6,10 +6,38 @@ local _camera = require("ents.camera")
 local _hitbox = require("ents.hitbox")
 local _world = require("ents.world")
 
+local anim8 = require("anim8")
+local img = love.graphics.newImage("assets/sprites/bg.png")
+img:setFilter("nearest", "nearest")
+local grid = anim8.newGrid(16,16,128,128,0,0,0)
+local fencegrid = anim8.newGrid(16,32,128,128,0,0,0)
+
 --local healthbar = require("ui.healthbar")
 --local menu = require("ui.menu")
 --local minimap = require("ui.minimap")
 --local enemy_healthbars = require("ui.enm_healthbars")
+
+local maptilesize = 16
+local maptiles = 64
+local maptruesize = maptilesize*maptiles
+local randograss={}
+for i=1,64 do
+	randograss[i] = {
+		math.random(1, maptiles), 
+		math.random(1, maptiles), 
+		anim8.newAnimation(grid(math.random(1,8),math.random(1,2)),100)
+	}
+end
+local fencesprite={
+	tl=anim8.newAnimation(fencegrid(1,2),100),
+	ml=anim8.newAnimation(fencegrid(1,3),100),
+	bl=anim8.newAnimation(fencegrid(1,4),100),
+	bm=anim8.newAnimation(fencegrid(2,4),100),
+	br=anim8.newAnimation(fencegrid(3,4),100),
+	mr=anim8.newAnimation(fencegrid(3,3),100),
+	tr=anim8.newAnimation(fencegrid(3,2),100),
+	tm=anim8.newAnimation(fencegrid(2,2),100)
+}
 
 function newPlayer()
 	local plr = _wolf.new()
@@ -43,10 +71,11 @@ function newCamera()
 end
 
 function newWalls()
-	local wall_left=_wall.new(-500,-500,30,1000)
-	local wall_right=_wall.new(500,-500,30,1030)
-	local wall_top=_wall.new(-500, -500, 1000, 30)
-	local wall_bottom=_wall.new(-500, 500, 1030, 30)
+	m = maptiles*maptilesize/2
+	local wall_left=_wall.new(-m,-m,maptilesize,m*2)
+	local wall_right=_wall.new(m,-m,maptilesize,m*2+maptilesize)
+	local wall_top=_wall.new(-m, -m, m*2, maptilesize)
+	local wall_bottom=_wall.new(-m, m, m*2+maptilesize, maptilesize)
 	wall_left.name = "Left wall"
 	wall_right.name = "Right wall"
 	wall_top.name = "Top wall"
@@ -167,9 +196,40 @@ function love.update(dt)
 end
 
 function love.draw()
-	love.graphics.clear(0,0,0,0)
+	local offx, offy = cam:getDrawOffset()
+
+	love.graphics.clear(1,1,1,0)
+	--draw top walls
+	for i=1, maptiles-1 do
+		fencesprite.tm:draw(img,offx+i*maptilesize-maptilesize*maptiles/2,offy-maptilesize*maptiles/2)
+	end
+
 	for k,ent in pairs(world:getEntities()) do
 		--print("drawing ent ",k, ent)
 		ent:draw(cam)
+	end
+
+	--draw grass
+	love.graphics.setColor(1,1,1)
+	for _,grass in ipairs(randograss) do
+		grass[3]:draw(
+			img, 
+			grass[1]*maptilesize+offx-maptilesize*maptiles/2,
+			grass[2]*maptilesize+offy-maptilesize*maptiles/2
+		)
+	end
+
+	--draw other walls
+	love.graphics.setColor(1,1,1)
+	fencesprite.tl:draw(img,offx-maptilesize*maptiles/2,offy-maptilesize*maptiles/2)
+	fencesprite.tr:draw(img,offx+maptilesize*maptiles/2,offy-maptilesize*maptiles/2)
+	fencesprite.bl:draw(img,offx-maptilesize*maptiles/2,offy+maptilesize*maptiles/2)
+	fencesprite.br:draw(img,offx+maptilesize*maptiles/2,offy+maptilesize*maptiles/2)
+	for i=1, maptiles/2 - 1 do
+		fencesprite.ml:draw(img,offx-maptilesize*maptiles/2,offy+i*maptilesize*2-maptilesize*maptiles/2)
+		fencesprite.mr:draw(img,offx+maptilesize*maptiles/2,offy+i*maptilesize*2-maptilesize*maptiles/2)
+	end
+	for i=1, maptiles-1 do
+		fencesprite.bm:draw(img,offx+i*maptilesize-maptilesize*maptiles/2,offy+maptilesize*maptiles/2)
 	end
 end
