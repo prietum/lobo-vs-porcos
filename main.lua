@@ -6,6 +6,9 @@ local _camera = require("ents.camera")
 local _hitbox = require("ents.hitbox")
 local _world = require("ents.world")
 
+local _healthbar = require("ui.healthbar")
+local _score = require("ui.score")
+
 local anim8 = require("anim8")
 local img = love.graphics.newImage("assets/sprites/bg.png")
 img:setFilter("nearest", "nearest")
@@ -116,11 +119,11 @@ function love.handlers.entHit(hitted_id, hitbox_id)
 		print("wolf hitted pig.")
 
 		hitted:damage(10)
-		hitted:stun(0.2, {hitbox.usr_data[1], hitbox.usr_data[2]}, 500)
+		hitted:stun(0.2, {hitbox.usr_data[1], hitbox.usr_data[2]}, 300)
 	elseif hitted.class == "wolf" and hitted.state ~= "stun" then
 		print("pig hitted wolf.")
 
-		hitted:damage(10)
+		hitted:damage(1)
 		hitted:stun(0.3, {hitbox.usr_data[1], hitbox.usr_data[2]}, 300)
 	end
 end
@@ -185,9 +188,16 @@ function love.update(dt)
 		love.event.push("respawnPlayer")
 	end
 
+	pigslen = 0
+	for _, ent in pairs(world:getEntities()) do
+		if ent.class == "pig" then
+			pigslen = pigslen + 1
+		end
+	end
+
 	b = b - dt
-	if b<=0 then
-		b = b + 10
+	if b<=0 and pigslen <= 6 then
+		b = b + 2
 		local tab = {math.random(1,100)}
 		love.event.push("spawnEnemy")
 	end
@@ -200,6 +210,7 @@ function love.draw()
 
 	love.graphics.clear(1,1,1,0)
 	--draw top walls
+	love.graphics.setColor(1,1,1)
 	for i=1, maptiles-1 do
 		fencesprite.tm:draw(img,offx+i*maptilesize-maptilesize*maptiles/2,offy-maptilesize*maptiles/2)
 	end
@@ -231,5 +242,11 @@ function love.draw()
 	end
 	for i=1, maptiles-1 do
 		fencesprite.bm:draw(img,offx+i*maptilesize-maptilesize*maptiles/2,offy+maptilesize*maptiles/2)
+	end
+
+	--draw UI
+	if world:getPlayer() then
+		_healthbar:draw(world:getPlayer())
+		_score:draw(3,3)
 	end
 end

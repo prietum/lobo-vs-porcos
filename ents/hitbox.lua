@@ -33,16 +33,19 @@ function _hitbox:updatePhysics(dt, world) --TODO switch for radial check
 		local dad = false
 		local atom = false
 		local dead = false
+		local same = false
 
 		dead = ent.destroyed
 		ego = self.id==ent.id
 		dad = self.casterid==ent.id
 		atom = ent.width==0 and ent.height==0
 		hbx = ent.class == "hitbox" or ent.class == "wall"
+		caster = world:getEntity(self.casterid)
+		same = caster.class==ent.class
 
 		--print(self.caster, ent)
 
-		if not dead and not ego and not atom and not dad and not hbx then
+		if not dead and not ego and not atom and not dad and not hbx and not same then
 			local AA = self.x+self.width>ent.x and self.x<ent.x+ent.width
 			local BB = self.y+self.height>ent.y and self.y<ent.y+ent.height
 			

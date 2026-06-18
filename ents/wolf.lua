@@ -15,11 +15,11 @@ function _wolf.new()
 	new_wolf.name = "wolf"
 	new_wolf.class = "wolf"
 
-	new_wolf.maxhp=100
+	new_wolf.maxhp=5
 	new_wolf.hp=new_wolf.maxhp
 
 	new_wolf.maxpp=100
-	new_wolf.pp=new_wolf.maxpp
+	new_wolf.pp=0--new_wolf.maxpp
 
 	new_wolf.mx = 1
 	new_wolf.my = 0
@@ -41,7 +41,7 @@ function _wolf.new()
 	new_wolf.atk1_t = 0
 	new_wolf.atk1_tt = 0.3
 	new_wolf.atk1_c = 0
-	new_wolf.atk1_cc = 0.4
+	new_wolf.atk1_cc = 0.5
 
 	new_wolf.stun_t = 0
 	new_wolf.stun_p = 0
@@ -124,6 +124,8 @@ function _wolf:updateBehavior(dt, world)
 	self.anim.stun1:update(dt)
 	self.anim.stun2:update(dt)
 
+	self.pp = math.min(self.pp + dt, self.maxpp)
+
 	self.atk1_c = math.max(self.atk1_c-dt,0)
 	self.atk1_t = math.max(self.atk1_t-dt,0)
 	self.stun_t = math.max(self.stun_t-dt,0)
@@ -151,8 +153,8 @@ function _wolf:updateBehavior(dt, world)
 			love.event.push("queryHitbox",x,y,w,h,casterid,usr_data)
 		end
 
-		self.dx = self.amx*50
-		self.dy = self.amy*50
+		self.dx = self.amx*100
+		self.dy = self.amy*100
 	elseif self.state == "stun" then
 		if self.stun_t <= 0 then
 			self.state = "idle"
@@ -218,13 +220,13 @@ function _wolf:draw(camera)
 	end
 
 	--Healthbar TODO replace with UI element
-	love.graphics.setColor(1,1,1)
-	love.graphics.rectangle("fill",
-		self.x + offx,
-		self.y + self.height + 5 + offy,
-		self.width * self.hp/self.maxhp,
-		5
-		)
+	--love.graphics.setColor(1,1,1)
+	--love.graphics.rectangle("fill",
+	--	self.x + offx,
+	--	self.y + self.height + 5 + offy,
+	--	self.width * self.hp/self.maxhp,
+	--	5
+	--	)
 end
 
 return _wolf
