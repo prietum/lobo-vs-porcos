@@ -9,6 +9,8 @@ local img = love.graphics.newImage("assets/sprites/lobo.png")
 img:setFilter("nearest", "nearest")
 local grid = anim8.newGrid(64,64,512,384,0,0,0)
 
+local swing_sfx = love.audio.newSource("assets/music/swing.mp3", "static")
+
 function _wolf.new()
 	local new_wolf = _ent.new()
 
@@ -45,6 +47,9 @@ function _wolf.new()
 
 	new_wolf.stun_t = 0
 
+	new_wolf.inv_t = 0
+	new_wolf.inv_tt = 1
+
 	new_wolf.anim = {
 		idle=anim8.newAnimation(grid("1-8",1),0.1),
 		walk=anim8.newAnimation(grid("1-8",2),0.1),
@@ -75,6 +80,9 @@ end
 
 function _wolf:damage(v)
 	self.hp = math.max(self.hp - v, 0)
+
+	--invicibility
+	self.inv_t = self.inv_tt
 end
 
 function _wolf:stun(t, dir, spd)
@@ -92,6 +100,7 @@ end
 function _wolf:attack()
 	--love.event.push("plrAttacked", self)
 	if self.state == "idle" and self.atk1_c <= 0 then
+		swing_sfx:play()
 		self.state = "atk1"
 
 		local anim = self.anim["atk1"..tostring(self.atk1_p)]
@@ -123,6 +132,7 @@ function _wolf:updateBehavior(dt, world)
 	self.atk1_c = math.max(self.atk1_c-dt,0)
 	self.atk1_t = math.max(self.atk1_t-dt,0)
 	self.stun_t = math.max(self.stun_t-dt,0)
+	self.inv_t = math.max(self.inv_t-dt,0)
 
 	if self.state == "idle" then
 		self.dx = self.mx*250
@@ -170,56 +180,49 @@ function _wolf:draw(camera)
 		)
 
 	--Sprite
-	love.graphics.setColor(1,1,1)
-	if self.state == "atk1" then
-		local anim = self.anim["atk1"..tostring(self.atk1_p)]
-		anim:draw(
-			img, 
-			self.x + offx - 64/4 + math.abs(math.min(self.oomx, 0)) * 64*1, 
-			self.y + offy - 64/4,
-			0,
-			1 * self.oomx,
-			1
-		)
-	elseif self.state == "stun" then
-		local anim = self.anim["stun"]
-		anim:draw(
-			img, 
-			self.x + offx - 64/4 + math.abs(math.min(self.oomx, 0)) * 64*1, 
-			self.y + offy - 64/4,
-			0,
-			1 * self.oomx,
-			1
-		)
-
-	elseif self.mx ~= 0 or self.my ~= 0 then
-		self.anim.walk:draw(
-			img, 
-			self.x + offx - 64/4 + math.abs(math.min(self.oomx, 0)) * 64*1, 
-			self.y + offy - 64/4,
-			0,
-			1 * self.oomx,
-			1
-		)
-	else
-		self.anim.idle:draw(
-			img, 
-			self.x + offx - 64/4 + math.abs(math.min(self.oomx, 0)) * 64*1, 
-			self.y + offy - 64/4,
-			0,
-			1 * self.oomx,
-			1
-		)
+	if self.inv_t <= 0 or self.inv_t%0.2 < 0.1 then
+		love.graphics.setColor(1,1,1)
+		if self.state == "atk1" then
+			local anim = self.anim["atk1"..tostring(self.atk1_p)]
+			anim:draw(
+				img, 
+				self.x + offx - 64/4 + math.abs(math.min(self.oomx, 0)) * 64*1, 
+				self.y + offy - 64/4,
+				0,
+				1 * self.oomx,
+				1
+			)
+		elseif self.state == "stun" then
+			local anim = self.anim["stun"]
+			anim:draw(
+				img, 
+				self.x + offx - 64/4 + math.abs(math.min(self.oomx, 0)) * 64*1, 
+				self.y + offy - 64/4,
+				0,
+				1 * self.oomx,
+				1
+			)
+	
+		elseif self.mx ~= 0 or self.my ~= 0 then
+			self.anim.walk:draw(
+				img, 
+				self.x + offx - 64/4 + math.abs(math.min(self.oomx, 0)) * 64*1, 
+				self.y + offy - 64/4,
+				0,
+				1 * self.oomx,
+				1
+			)
+		else
+			self.anim.idle:draw(
+				img, 
+				self.x + offx - 64/4 + math.abs(math.min(self.oomx, 0)) * 64*1, 
+				self.y + offy - 64/4,
+				0,
+				1 * self.oomx,
+				1
+			)
+		end
 	end
-
-	--Healthbar TODO replace with UI element
-	--love.graphics.setColor(1,1,1)
-	--love.graphics.rectangle("fill",
-	--	self.x + offx,
-	--	self.y + self.height + 5 + offy,
-	--	self.width * self.hp/self.maxhp,
-	--	5
-	--	)
 end
 
 return _wolf

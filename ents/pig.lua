@@ -9,6 +9,8 @@ local img = love.graphics.newImage("assets/sprites/spear_pig.png")
 img:setFilter("nearest", "nearest")
 local grid = anim8.newGrid(64,64,512,256,0,0,0)
 
+local swing_sfx = love.audio.newSource("assets/music/swing.mp3", "static")
+
 function _pig.new()
 	local new_pig = _ent.new()
 
@@ -104,6 +106,10 @@ function _pig:updateBehavior(dt, world)
 			dirx = dirx + 0.1*pdiffx/pdiffm
 			diry = diry + 0.1*pdiffy/pdiffm
 		end
+	end
+
+	if self.atk_d > 0 and self.atk_d - dt <= 0 then
+		swing_sfx:play()
 	end
 
 	self.atk_c = math.max(self.atk_c-dt,0)

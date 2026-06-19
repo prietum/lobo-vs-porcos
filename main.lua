@@ -15,10 +15,9 @@ img:setFilter("nearest", "nearest")
 local grid = anim8.newGrid(16,16,128,128,0,0,0)
 local fencegrid = anim8.newGrid(16,32,128,128,0,0,0)
 
---local healthbar = require("ui.healthbar")
---local menu = require("ui.menu")
---local minimap = require("ui.minimap")
---local enemy_healthbars = require("ui.enm_healthbars")
+local ost = love.audio.newSource("assets/music/ost.mp3", "stream")
+local hitwolf_sfx = love.audio.newSource("assets/music/hit_wolf.mp3", "static")
+local hitpig_sfx = love.audio.newSource("assets/music/hit_pig.mp3", "static")
 
 local maptilesize = 16
 local maptiles = 64
@@ -102,6 +101,9 @@ function love.load()
 
 	newWalls()
 	cam = newCamera()
+
+	ost:setLooping(true)
+	ost:play()
 end
 
 function love.handlers.entHit(hitted_id, hitbox_id)
@@ -116,12 +118,16 @@ function love.handlers.entHit(hitted_id, hitbox_id)
 	--print(caster.class, "hitted", hitted.class, "with", hitbox.class)
 
 	if hitted.class == "pig" and hitted.state ~= "stun" then
-		print("wolf hitted pig.")
+		--print("wolf hitted pig.")
+
+		hitpig_sfx:play()
 
 		hitted:damage(10)
 		hitted:stun(0.2, {hitbox.usr_data[1], hitbox.usr_data[2]}, 300)
-	elseif hitted.class == "wolf" and hitted.state ~= "stun" then
-		print("pig hitted wolf.")
+	elseif hitted.class == "wolf" and hitted.state ~= "stun" and hitted.inv_t <= 0 then
+		--print(hitted.inv_t)
+		--print("pig hitted wolf.")
+		hitwolf_sfx:play()
 
 		hitted:damage(1)
 		hitted:stun(0.3, {hitbox.usr_data[1], hitbox.usr_data[2]}, 300)
@@ -160,10 +166,6 @@ function love.keypressed(key)
 		love.event.quit()
 	end
 end
-
---lembrete
---		>	passe entidades pelos eventos como ID. elas não são passadas por referência, aparentemente.
---			ent.id ao invés de ent
 
 local b = 1
 function love.update(dt)
