@@ -7,7 +7,7 @@ setmetatable(_wolf, _ent)
 
 local img = love.graphics.newImage("assets/sprites/lobo.png")
 img:setFilter("nearest", "nearest")
-local grid = anim8.newGrid(64,64,512,512,0,0,0)
+local grid = anim8.newGrid(64,64,512,384,0,0,0)
 
 function _wolf.new()
 	local new_wolf = _ent.new()
@@ -44,8 +44,6 @@ function _wolf.new()
 	new_wolf.atk1_cc = 0.5
 
 	new_wolf.stun_t = 0
-	new_wolf.stun_p = 0
-	new_wolf.stun_pp= 3
 
 	new_wolf.anim = {
 		idle=anim8.newAnimation(grid("1-8",1),0.1),
@@ -53,9 +51,7 @@ function _wolf.new()
 		atk10=anim8.newAnimation(grid("1-3",3),0.1),
 		atk11=anim8.newAnimation(grid("1-3",4),0.1),
 		atk12=anim8.newAnimation(grid("1-3",5),0.1),
-		stun0=anim8.newAnimation(grid("1-2",6),0.1),
-		stun1=anim8.newAnimation(grid("1-2",7),0.1),
-		stun2=anim8.newAnimation(grid("1-2",8),0.1),
+		stun=anim8.newAnimation(grid("1-2",6),0.1),
 	}
 
 	return setmetatable(new_wolf, _wolf)
@@ -84,7 +80,7 @@ end
 function _wolf:stun(t, dir, spd)
 	self.state = "stun"
 
-	local anim = self.anim["stun"..tostring(self.stun_p)]
+	local anim = self.anim["stun"]
 	anim:gotoFrame(1)
 	anim:resume()
 
@@ -120,9 +116,7 @@ function _wolf:updateBehavior(dt, world)
 	self.anim.atk10:update(dt)
 	self.anim.atk11:update(dt)
 	self.anim.atk12:update(dt)
-	self.anim.stun0:update(dt)
-	self.anim.stun1:update(dt)
-	self.anim.stun2:update(dt)
+	self.anim.stun:update(dt)
 
 	self.pp = math.min(self.pp + dt, self.maxpp)
 
@@ -158,7 +152,6 @@ function _wolf:updateBehavior(dt, world)
 	elseif self.state == "stun" then
 		if self.stun_t <= 0 then
 			self.state = "idle"
-			self.stun_p = (self.stun_p + 1) % self.stun_pp
 		end
 	end
 end
@@ -189,7 +182,7 @@ function _wolf:draw(camera)
 			1
 		)
 	elseif self.state == "stun" then
-		local anim = self.anim["stun"..tostring(self.stun_p)]
+		local anim = self.anim["stun"]
 		anim:draw(
 			img, 
 			self.x + offx - 64/4 + math.abs(math.min(self.oomx, 0)) * 64*1, 
