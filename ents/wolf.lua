@@ -7,14 +7,14 @@ setmetatable(_wolf, _ent)
 
 local img = love.graphics.newImage("assets/sprites/lobo.png")
 img:setFilter("nearest", "nearest")
-local grid = anim8.newGrid(64,64,512,384,0,0,0)
+local grid = anim8.newGrid(64,64,512,576,0,0,0)
 
 local swing_sfx = love.audio.newSource("assets/music/swing.mp3", "static")
 
 local function lerp_quad(a,b,t,e)
 	f = -e*t^2 + (1+e)*t
 	--f = (f + 1)/2
-	print(t, f)
+	--print(t, f)
 	return a + (b-a)*f
 end
 
@@ -60,7 +60,7 @@ function _wolf.new()
 	new_wolf.atk2_cc = 3
 
 	new_wolf.atk3_t = 0
-	new_wolf.atk3_tt = 1
+	new_wolf.atk3_tt = 0.4
 	new_wolf.atk3_c = 0
 	new_wolf.atk3_cc = 5
 
@@ -75,7 +75,10 @@ function _wolf.new()
 		atk10=anim8.newAnimation(grid("1-3",3),0.1),
 		atk11=anim8.newAnimation(grid("1-3",4),0.1),
 		atk12=anim8.newAnimation(grid("1-3",5),0.1),
-		stun=anim8.newAnimation(grid("1-2",6),0.1),
+		atk20=anim8.newAnimation(grid("1-5",6),0.1),
+		atk21=anim8.newAnimation(grid("1-2",7),0.1),
+		atk30=anim8.newAnimation(grid("1-1",8),0.1),
+		stun=anim8.newAnimation(grid("1-2",9),0.1),
 	}
 
 	return setmetatable(new_wolf, _wolf)
@@ -142,7 +145,7 @@ function _wolf:sopra()
 		self.state = "atk2"
 		self.pp = self.pp - self.maxpp/2
 
-		local anim = self.anim["idle"]--["atk20"]
+		local anim = self.anim["atk20"]
 		anim:gotoFrame(1)
 		anim:resume()
 
@@ -161,7 +164,7 @@ function _wolf:devour()
 		self.state = "atk3"
 		self.pp = 0
 
-		local anim = self.anim["idle"]--["atk30"]
+		local anim = self.anim["atk30"]
 		anim:gotoFrame(1)
 		anim:resume()
 
@@ -183,9 +186,9 @@ function _wolf:updateBehavior(dt, world)
 	self.anim.atk10:update(dt)
 	self.anim.atk11:update(dt)
 	self.anim.atk12:update(dt)
-	--self.anim.atk20:update(dt)
-	--self.anim.atk21:update(dt)
-	--self.anim.atk30:update(dt)
+	self.anim.atk20:update(dt)
+	self.anim.atk21:update(dt)
+	self.anim.atk30:update(dt)
 	--self.anim.atk31:update(dt)
 	self.anim.stun:update(dt)
 
@@ -204,11 +207,11 @@ function _wolf:updateBehavior(dt, world)
 
 	if self.state == "idle" then
 		self.pp = math.min(self.pp + dt*10, self.maxpp)
-		
+
 		spd = lerp_quad(25,250,self.pp/self.maxpp,1)
 		self.dx = self.mx*spd--(50+200*self.pp/self.maxpp)
 		self.dy = self.my*spd--(50+200*self.pp/self.maxpp)
-		print(spd)
+		--print(spd)
 	elseif self.state == "atk1" then
 		if self.atk1_t <= 0 then
 			self.state = "idle"
@@ -237,7 +240,7 @@ function _wolf:updateBehavior(dt, world)
 		end
 
 		--Cast hitbox
-		do
+		if self.atk2_d <=0 then
 			u = (self.omx^2+self.omy^2)^(1/2)
 			ox = (self.omx/u)
 			oy = (self.omy/u)
@@ -248,10 +251,14 @@ function _wolf:updateBehavior(dt, world)
 			casterid = self.id
 			usr_data = {ox,oy,"atk2"}
 			love.event.push("queryHitbox",x,y,w,h,casterid,usr_data)
-		end
 
-		self.dx = 0
-		self.dy = 0
+			self.dx = -self.omx*25
+			self.dy = -self.omy*25
+		else
+			self.dx = self.omx*25
+			self.dy = self.omy*25
+		end
+		
 	elseif self.state == "atk3" then
 		if self.atk3_t <= 0 then
 			self.state = "idle"
@@ -271,8 +278,8 @@ function _wolf:updateBehavior(dt, world)
 			love.event.push("queryHitbox",x,y,w,h,casterid,usr_data)
 		end
 
-		self.dx = self.amx*100
-		self.dy = self.amy*100
+		self.dx = self.amx*500
+		self.dy = self.amy*500
 	elseif self.state == "stun" then
 		if self.stun_t <= 0 then
 			self.state = "idle"
@@ -311,6 +318,51 @@ function _wolf:draw(camera)
 				1 * self.oomx,
 				1
 			)
+		elseif self.state == "atk2" then
+			local anim
+			if self.atk2_d > 0 then
+				anim = self.anim["atk20"]
+			else
+				anim = self.anim["atk21"]
+			end
+
+			anim:draw(
+				img, 
+				self.x + offx - 64/4 + math.abs(math.min(self.oomx, 0)) * 64*1, 
+				self.y + offy - 64/4,
+				0,
+				1 * self.oomx,
+				1
+			)
+		elseif self.state == "atk3" then
+			local anim = self.anim["atk30"]
+
+			--akuma styled ghost
+			local r,g,b = love.graphics.getColor()
+			love.graphics.setColor(1.00,0.00,0.00)
+			amx = self.amx
+			if amx == 0 then amx = 1 end
+			for i = self.atk3_tt - self.atk3_t, 0, -0.1 do
+				anim:draw(
+				img, 
+				self.x + offx - 64/4 + math.abs(math.min(self.amx, 0)) * 64*1 - (self.amx*500*i), 
+				self.y + offy - 64/4 - (self.amy*500*i),
+				0,
+				1 * amx,
+				1
+			)
+			end
+
+			love.graphics.setColor(r,g,b)
+			anim:draw(
+				img, 
+				self.x + offx - 64/4 + math.abs(math.min(self.amx, 0)) * 64*1, 
+				self.y + offy - 64/4,
+				0,
+				1 * amx,
+				1
+			)
+
 		elseif self.state == "stun" then
 			local anim = self.anim["stun"]
 			anim:draw(

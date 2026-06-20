@@ -8,6 +8,7 @@ local _world = require("ents.world")
 
 local _healthbar = require("ui.healthbar")
 local _score = require("ui.score")
+local score = 0
 
 local anim8 = require("anim8")
 local img = love.graphics.newImage("assets/sprites/bg.png")
@@ -166,6 +167,14 @@ function love.handlers.respawnPlayer()
 	newPlayer()
 end
 
+function love.handlers.playerDied()
+	score = 0
+end
+
+function love.handlers.pigDied()
+	score = score+1
+end
+
 function love.keyreleased(key)
 	ipt.update(key,false)
 end
@@ -229,11 +238,6 @@ function love.draw()
 		fencesprite.tm:draw(img,offx+i*maptilesize-maptilesize*maptiles/2,offy-maptilesize*maptiles/2)
 	end
 
-	for k,ent in pairs(world:getEntities()) do
-		--print("drawing ent ",k, ent)
-		ent:draw(cam)
-	end
-
 	--draw grass
 	love.graphics.setColor(1,1,1)
 	for _,grass in ipairs(randograss) do
@@ -242,6 +246,11 @@ function love.draw()
 			grass[1]*maptilesize+offx-maptilesize*maptiles/2,
 			grass[2]*maptilesize+offy-maptilesize*maptiles/2
 		)
+	end
+
+	for k,ent in pairs(world:getEntities()) do
+		--print("drawing ent ",k, ent)
+		ent:draw(cam)
 	end
 
 	--draw other walls
@@ -261,6 +270,6 @@ function love.draw()
 	--draw UI
 	if world:getPlayer() then
 		_healthbar:draw(world:getPlayer())
-		_score:draw(3,3)
+		_score:draw(score)
 	end
 end

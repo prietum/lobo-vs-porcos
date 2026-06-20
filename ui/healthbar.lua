@@ -1,4 +1,3 @@
---singleton
 healthbar = {
 	width = 300,
 	height = 25,

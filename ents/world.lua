@@ -101,9 +101,11 @@ function _world:updateAll(dt)
 			self._ents[k] = nil
 
 			-- clear up special id vars
-			if self.plrid == k then print("Player destroyed.") self.plrid = nil
+			if self.plrid == k then print("Player destroyed.") self.plrid = nil love.event.push("playerDied")
 			elseif self.camid == k then print("Camera destroyed.") self.camid = nil
 			end
+
+			if ent.class=="pig" then print("Pig destroyed.") love.event.push("pigDied") end
 		else
 			ent:updateBehavior(dt, self)
 			ent:updatePhysics(dt, world)
