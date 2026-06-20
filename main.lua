@@ -56,8 +56,8 @@ end
 function newEnemy()
 	local pig = _pig.new()
 	local spwang = math.random(0,628)/100 --todo
-	pig.x=-100
-	pig.y= 100
+	pig.x=math.random(-maptilesize*maptiles/3,maptilesize*maptiles/3)
+	pig.y=math.random(-maptilesize*maptiles/3,maptilesize*maptiles/3)
 	world:addEntity(pig)
 	for _, other_pig in pairs(world:getEntities()) do
 		if other_pig.class == "pig" and other_pig ~= pig then
@@ -102,8 +102,8 @@ function love.load()
 	newWalls()
 	cam = newCamera()
 
-	ost:setLooping(true)
-	ost:play()
+	--ost:setLooping(true)
+	--ost:play()
 end
 
 function love.handlers.entHit(hitted_id, hitbox_id)
@@ -117,13 +117,24 @@ function love.handlers.entHit(hitted_id, hitbox_id)
 
 	--print(caster.class, "hitted", hitted.class, "with", hitbox.class)
 
+	--TODO make hitbox userdata hitbox type (wind, atk1, devour)
+
 	if hitted.class == "pig" and hitted.state ~= "stun" then
 		--print("wolf hitted pig.")
-
-		hitpig_sfx:play()
-
-		hitted:damage(10)
-		hitted:stun(0.2, {hitbox.usr_data[1], hitbox.usr_data[2]}, 300)
+		if hitbox.usr_data[3] == "atk1" then
+			hitpig_sfx:play()
+			hitted:damage(25)
+			hitted:stun(0.2, {hitbox.usr_data[1], hitbox.usr_data[2]}, 300)
+		elseif hitbox.usr_data[3] == "atk2" then
+			hitted:damage(3)
+			hitted:stun(0.3, {hitbox.usr_data[1], hitbox.usr_data[2]}, 100)
+		elseif hitbox.usr_data[3] == "atk3" and caster.atk3_t > 0 then
+			hitpig_sfx:play() --TODO substitui por NHAC
+			hitted:damage(999999) --mortinho da silva
+			caster.atk3_t = 0 --termina o ataque 3 do lobo
+			caster.hp = math.min(caster.hp+2, caster.maxhp) --cura o lobo
+		end
+		
 	elseif hitted.class == "wolf" and hitted.state ~= "stun" and hitted.inv_t <= 0 then
 		--print(hitted.inv_t)
 		--print("pig hitted wolf.")
@@ -181,10 +192,11 @@ function love.update(dt)
 
 		if ipt["atk1"] then
 			plr:attack()
-		end
-
-		if ipt["atk2"] then
-			world:printAllEntities()
+		elseif ipt["atk2"] then
+			--world:printAllEntities()
+			plr:sopra()
+		elseif ipt["atk3"] then
+			plr:devour()
 		end
 	else
 		love.event.push("respawnPlayer")
