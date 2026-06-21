@@ -127,7 +127,7 @@ function love.handlers.entHit(hitted_id, hitbox_id)
 			hitted:damage(25)
 			hitted:stun(0.2, {hitbox.usr_data[1], hitbox.usr_data[2]}, 300)
 		elseif hitbox.usr_data[3] == "atk2" then
-			hitted:damage(3)
+			hitted:damage(4)
 			hitted:stun(0.3, {hitbox.usr_data[1], hitbox.usr_data[2]}, 100)
 		elseif hitbox.usr_data[3] == "atk3" and caster.atk3_t > 0 then
 			hitpig_sfx:play() --TODO substitui por NHAC

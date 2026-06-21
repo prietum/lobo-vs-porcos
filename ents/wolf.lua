@@ -78,7 +78,7 @@ function _wolf.new()
 		atk20=anim8.newAnimation(grid("1-5",6),0.1),
 		atk21=anim8.newAnimation(grid("1-2",7),0.1),
 		atk30=anim8.newAnimation(grid("1-1",8),0.1),
-		stun=anim8.newAnimation(grid("1-2",9),0.1),
+		stun=anim8.newAnimation(grid("1-2",9),0.1)
 	}
 
 	return setmetatable(new_wolf, _wolf)
@@ -292,13 +292,13 @@ function _wolf:draw(camera)
 
 	--Hitbox
 	local offx, offy = camera:getDrawOffset()
-	love.graphics.setColor(1,0,1)
-	love.graphics.rectangle("line", 
-		self.x + offx, 
-		self.y + offy, 
-		self.width,
-		self.height
-		)
+	--love.graphics.setColor(1,0,1)
+	--love.graphics.rectangle("line", 
+	--	self.x + offx, 
+	--	self.y + offy, 
+	--	self.width,
+	--	self.height
+	--)
 
 	--Sprite
 	if self.inv_t <= 0 or self.inv_t%0.2 < 0.1 then

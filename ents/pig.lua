@@ -182,13 +182,13 @@ function _pig:draw(camera)
 	local offx, offy = camera:getDrawOffset()
 
 	--Hitbox
-	love.graphics.setColor(1,1,0)
-	love.graphics.rectangle("line",
-		self.x + offx, 
-		self.y + offy, 
-		self.width,
-		self.height
-	)
+	--love.graphics.setColor(1,1,0)
+	--love.graphics.rectangle("line",
+	--	self.x + offx, 
+	--	self.y + offy, 
+	--	self.width,
+	--	self.height
+	--)
 
 	--Sprite
 	love.graphics.setColor(1,1,1)
