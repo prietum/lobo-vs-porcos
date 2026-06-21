@@ -1,5 +1,5 @@
 *.sublime-project
 *.sublime-workspace
 love.exe
-lobo.love
-lobo.exe
+*.love
+*.exe
