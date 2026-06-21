@@ -103,8 +103,8 @@ function love.load()
 	newWalls()
 	cam = newCamera()
 
-	--ost:setLooping(true)
-	--ost:play()
+	ost:setLooping(true)
+	ost:play()
 end
 
 function love.handlers.entHit(hitted_id, hitbox_id)
