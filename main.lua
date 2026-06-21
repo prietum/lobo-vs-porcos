@@ -98,6 +98,8 @@ function newWalls()
 end
 
 function love.load()
+	love.window.setTitle("Lobo VS Porcos")
+
 	world = _world.new()
 
 	newWalls()
