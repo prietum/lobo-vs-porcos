@@ -2,7 +2,7 @@
 **Windows**: baixe a release para Windows e rode o executável ```.exe```.  
 **Linux**: instale [LÖVE](https://love2d.org/) e rode o executável ```.love```  
 
-# Controles
+# Controles  
 **WASD**: movimentação  
 **I**: socar  
 **O**: soprar (requer 50% energia)  
